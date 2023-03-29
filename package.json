@@ -1,0 +1,28 @@
+{
+  "name": "ahj-25_7.1-help-desk-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "forever server.js",
+    "watch": "forever -w server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elenakoch122/ahj-25_7.1-help-desk-backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/elenakoch122/ahj-25_7.1-help-desk-backend/issues"
+  },
+  "homepage": "https://github.com/elenakoch122/ahj-25_7.1-help-desk-backend#readme",
+  "dependencies": {
+    "@koa/cors": "^4.0.0",
+    "forever": "^4.0.3",
+    "koa": "^2.14.1",
+    "koa-body": "^6.0.1",
+    "ws": "^8.13.0"
+  }
+}
