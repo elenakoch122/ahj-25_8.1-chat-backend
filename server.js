@@ -14,21 +14,35 @@ app.use(koaBody({
   json: true
 }));
 
-// app.use(router());
-
-const port = 7070;
+const port = process.env.PORT || 7070;
 const server = http.createServer(app.callback());
 
-const wsServer = new WS.Server({server});
+const wssServer = new WS.Server({server});
 
-const chat = ['welcome to chat'];
+const chat = [{
+  user: 'olga',
+  message: 'welcome to chat',
+  day: '20.03.2023',
+  time: '10:03'
+}];
 const users = ['olga'];
 
-wsServer.on('connection', (ws) => {
-  console.log('connection done');
-  ws.on('message', (message) => {
+wssServer.on('connection', (ws) => {
+  ws.on('message', (data) => {
+    console.log(data);
+    const message = JSON.parse(data);
+
     if (message.type === 'register') {
       users.push(message.nickname);
+
+
+      Array.from(wssServer.clients)
+        .filter(client => client.readyState === WS.OPEN)
+        .forEach(client => client.send(JSON.stringify({
+          type: 'users',
+          users
+        })));
+      return;
     }
 
     if (message.type === 'message') {
@@ -36,13 +50,13 @@ wsServer.on('connection', (ws) => {
 
       const eventData = JSON.stringify({ chat: [post] });
 
-      Array.from(wsServer.clients)
+      Array.from(wssServer.clients)
         .filter(client => client.readyState === WS.OPEN)
         .forEach(client => client.send(eventData));
     }
-  });
 
-  ws.send(JSON.stringify({ chat }));
+    // ws.send(JSON.stringify({ chat, users }));
+  });
 });
 
 server.listen(port, (err) => {
