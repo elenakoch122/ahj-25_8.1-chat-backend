@@ -29,12 +29,10 @@ const users = ['olga'];
 
 wssServer.on('connection', (ws) => {
   ws.on('message', (data) => {
-    console.log(data);
     const message = JSON.parse(data);
 
     if (message.type === 'register') {
       users.push(message.nickname);
-
 
       Array.from(wssServer.clients)
         .filter(client => client.readyState === WS.OPEN)
@@ -57,6 +55,8 @@ wssServer.on('connection', (ws) => {
 
     // ws.send(JSON.stringify({ chat, users }));
   });
+
+  ws.send('hello from server');
 });
 
 server.listen(port, (err) => {
