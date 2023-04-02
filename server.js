@@ -53,10 +53,11 @@ wssServer.on('connection', (ws) => {
         .forEach(client => client.send(eventData));
     }
 
-    // ws.send(JSON.stringify({ chat, users }));
+    ws.send(JSON.stringify({ chat, users }));
   });
 
-  ws.send('hello from server');
+  // ws.send('hello from server');
+  ws.send(JSON.stringify({ chat, users }));
 });
 
 server.listen(port, (err) => {
