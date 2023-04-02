@@ -22,11 +22,11 @@ const chat = [{
 }];
 const users = ['olga'];
 
-app.use((ctx) => {
-  if (ctx.request.query === 'users') {
+app.use(async (ctx) => {
+  ctx.response.set('Access-Control-Allow-Origin', '*');
+  if (ctx.request.method === 'GET') {
     ctx.response.body = users;
   }
-  ctx.response.set('Access-Control-Allow-Origin', '*');
 });
 
 const port = process.env.PORT || 7070;
