@@ -14,11 +14,6 @@ app.use(koaBody({
   json: true
 }));
 
-const port = process.env.PORT || 7070;
-const server = http.createServer(app.callback());
-
-const wssServer = new WS.Server({server});
-
 const chat = [{
   user: 'olga',
   message: 'welcome to chat',
@@ -27,12 +22,25 @@ const chat = [{
 }];
 const users = ['olga'];
 
-wssServer.on('connection', (ws) => {
-  ws.on('message', (data) => {
-    const message = JSON.parse(data);
+app.use((ctx) => {
+  if (ctx.request.query === 'users') {
+    ctx.response.body = users;
+  }
+  ctx.response.set('Access-Control-Allow-Origin', '*');
+});
 
-    if (message.type === 'register') {
-      users.push(message.nickname);
+const port = process.env.PORT || 7070;
+const server = http.createServer(app.callback());
+
+const wssServer = new WS.Server({server});
+
+
+wssServer.on('connection', (ws) => {
+  ws.on('message', (message) => {
+    const data = JSON.parse(message);
+
+    if (data.type === 'register') {
+      users.push(data.nickname);
 
       Array.from(wssServer.clients)
         .filter(client => client.readyState === WS.OPEN)
@@ -43,8 +51,8 @@ wssServer.on('connection', (ws) => {
       return;
     }
 
-    if (message.type === 'message') {
-      chat.push(message.post);
+    if (data.type === 'message') {
+      chat.push(data.post);
 
       const eventData = JSON.stringify({ chat: [post] });
 
@@ -53,10 +61,13 @@ wssServer.on('connection', (ws) => {
         .forEach(client => client.send(eventData));
     }
 
+    if (data.type === 'exit') {
+      users = users.filter(u => u !== data.nickname);
+    }
+
     ws.send(JSON.stringify({ chat, users }));
   });
 
-  // ws.send('hello from server');
   ws.send(JSON.stringify({ chat, users }));
 });
 
