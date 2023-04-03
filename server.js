@@ -22,18 +22,10 @@ const chat = [{
 }];
 const users = ['olga'];
 
-app.use(async (ctx) => {
-  ctx.response.set('Access-Control-Allow-Origin', '*');
-  if (ctx.request.method === 'GET') {
-    ctx.response.body = users;
-  }
-});
-
 const port = process.env.PORT || 7070;
 const server = http.createServer(app.callback());
 
 const wssServer = new WS.Server({server});
-
 
 wssServer.on('connection', (ws) => {
   ws.on('message', (message) => {
