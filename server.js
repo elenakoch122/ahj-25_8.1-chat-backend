@@ -64,6 +64,13 @@ wssServer.on('connection', (ws) => {
 
     if (data.type === 'exit') {
       users = users.filter(u => u !== data.nickname);
+
+      Array.from(wssServer.clients)
+        .filter(client => client.readyState === WS.OPEN)
+        .forEach(client => client.send(JSON.stringify({
+          type: 'users',
+          users,
+        })));
       return;
     }
 
