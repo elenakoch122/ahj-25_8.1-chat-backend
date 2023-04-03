@@ -69,7 +69,7 @@ wssServer.on('connection', (ws) => {
       return;
     }
 
-    ws.send(JSON.stringify({ type: 'users', users }));
+    ws.send(JSON.stringify({ type: 'enter', users }));
     ws.send(JSON.stringify({ type: 'messages', chat }));
   });
 
