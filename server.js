@@ -22,6 +22,16 @@ const chat = [{
 }];
 const users = ['olga'];
 
+app.use(async (ctx) => {
+  let { method } = ctx.request.query;
+
+  ctx.response.set('Access-Control-Allow-Origin', '*');
+
+  if (method === 'users') {
+    ctx.response.body = users;
+  }
+});
+
 const port = process.env.PORT || 7070;
 const server = http.createServer(app.callback());
 
