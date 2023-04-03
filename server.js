@@ -6,7 +6,7 @@ const WS = require('ws');
 
 const app = new Koa();
 
-// app.use(cors());
+app.use(cors());
 
 app.use(koaBody({
   urlencoded: true,
@@ -22,47 +22,15 @@ const chat = [{
 }];
 const users = ['olga'];
 
-app.use(async (ctx, next) => {
-  const origin = ctx.request.get('Origin');
-  if (!origin) {
-    return await next();
-  }
+// app.use(async (ctx) => {
+//   let { method } = ctx.request.query;
 
-  const headers = { 'Access-Control-Allow-Origin': '*', };
+//   ctx.response.set('Access-Control-Allow-Origin', '*');
 
-  if (ctx.request.method !== 'OPTIONS') {
-    ctx.response.set({ ...headers });
-    try {
-      return await next();
-    } catch (e) {
-      e.headers = { ...e.headers, ...headers };
-      throw e;
-    }
-  }
-
-  if (ctx.request.get('Access-Control-Request-Method')) {
-    ctx.response.set({
-      ...headers,
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH',
-    });
-
-    if (ctx.request.get('Access-Control-Request-Headers')) {
-      ctx.response.set('Access-Control-Allow-Headers', ctx.request.get('Access-Control-Request-Headers'));
-    }
-
-    ctx.response.status = 204;
-  }
-});
-
-app.use(async (ctx) => {
-  let { method } = ctx.request.query;
-
-  ctx.response.set('Access-Control-Allow-Origin', '*');
-
-  if (method === 'users') {
-    ctx.response.body = users;
-  }
-});
+//   if (method === 'users') {
+//     ctx.response.body = users;
+//   }
+// });
 
 const port = process.env.PORT || 7070;
 const server = http.createServer(app.callback());
@@ -93,13 +61,14 @@ wssServer.on('connection', (ws) => {
       Array.from(wssServer.clients)
         .filter(client => client.readyState === WS.OPEN)
         .forEach(client => client.send(eventData));
+        return;
     }
 
     if (data.type === 'exit') {
       users = users.filter(u => u !== data.nickname);
+      return;
     }
 
-    // ws.send(JSON.stringify({ chat, users }));
     ws.send(JSON.stringify({ type: 'users', users }));
     ws.send(JSON.stringify({ type: 'messages', chat }));
   });
