@@ -46,7 +46,7 @@ wssServer.on('connection', (ws) => {
         .filter(client => client.readyState === WS.OPEN)
         .forEach(client => client.send(JSON.stringify({
           type: 'users',
-          users
+          users,
         })));
       return;
     }
@@ -67,11 +67,11 @@ wssServer.on('connection', (ws) => {
       return;
     }
 
-    ws.send(JSON.stringify({ type: 'enter', users }));
-    ws.send(JSON.stringify({ type: 'messages', chat }));
+    // ws.send(JSON.stringify({ type: 'enter', users }));
+    // ws.send(JSON.stringify({ type: 'messages', chat }));
   });
 
-  ws.send(JSON.stringify({ type: 'users', users }));
+  // ws.send(JSON.stringify({ type: 'users', users }));
   ws.send(JSON.stringify({ type: 'messages', chat }));
 });
 
