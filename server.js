@@ -22,17 +22,15 @@ const chat = [{
 }];
 const users = ['olga'];
 
-// app.use(async (ctx) => {
-//   let { method } = ctx.request.query;
+app.use(async (ctx) => {
+  if (ctx.request.method !== 'GET') return;
 
-//   ctx.response.set('Access-Control-Allow-Origin', '*');
-
-//   if (method === 'users') {
-//     ctx.response.body = users;
-//   }
-// });
+  ctx.response.set('Access-Control-Allow-Origin', '*');
+  ctx.response.body = users;
+});
 
 const port = process.env.PORT || 7070;
+// const port = 7070;
 const server = http.createServer(app.callback());
 
 const wssServer = new WS.Server({server});
