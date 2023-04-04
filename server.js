@@ -57,11 +57,12 @@ wssServer.on('connection', (ws) => {
     if (data.type === 'message') {
       chat.push(data.post);
 
-      const eventData = JSON.stringify({ chat: [post] });
-
       Array.from(wssServer.clients)
         .filter(client => client.readyState === WS.OPEN)
-        .forEach(client => client.send(eventData));
+        .forEach(client => client.send(JSON.stringify({
+          type: 'message',
+          message: data.post,
+        })));
         return;
     }
 
@@ -85,7 +86,7 @@ wssServer.on('connection', (ws) => {
   });
 
   // ws.send(JSON.stringify({ type: 'users', users }));
-  ws.send(JSON.stringify({ type: 'messages', chat }));
+  ws.send(JSON.stringify({ type: 'allMessages', chat }));
 });
 
 server.listen(port, (err) => {
