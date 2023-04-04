@@ -15,7 +15,7 @@ app.use(koaBody({
   json: true
 }));
 
-// let clients = {};
+let clients = {};
 
 const chat = [{
   user: 'olga',
@@ -38,15 +38,15 @@ const server = http.createServer(app.callback());
 const wssServer = new WS.Server({server});
 
 wssServer.on('connection', (ws) => {
-  // clients[uuid.v4()] = ws;
+  const id = uuid.v4();
+  clients.id.ws = ws;
 
   ws.on('message', (message) => {
     const data = JSON.parse(message);
 
     if (data.type === 'register') {
       users.push(data.nickname);
-
-      // clients.set(data.nickname, ws);
+      clients.id.user = data.nickname;
 
       Array.from(wssServer.clients)
         .filter(client => client.readyState === WS.OPEN)
@@ -86,9 +86,9 @@ wssServer.on('connection', (ws) => {
   });
 
   ws.on('close', () => {
-    // users = users.filter(u => u !== data.nickname);
+    users = users.filter(u => u !== clients.id.user);
 
-    // delete clients[id];
+    delete clients.id;
 
     Array.from(wssServer.clients)
       .filter(client => client.readyState === WS.OPEN)
