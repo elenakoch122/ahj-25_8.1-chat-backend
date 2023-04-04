@@ -3,6 +3,7 @@ const Koa = require('koa');
 const { koaBody } = require('koa-body');
 const cors = require('@koa/cors');
 const WS = require('ws');
+const uuid = require('uuid');
 
 const app = new Koa();
 
@@ -14,7 +15,7 @@ app.use(koaBody({
   json: true
 }));
 
-let clients = new Map();
+let clients = {};
 
 const chat = [{
   user: 'olga',
@@ -37,6 +38,8 @@ const server = http.createServer(app.callback());
 const wssServer = new WS.Server({server});
 
 wssServer.on('connection', (ws) => {
+  clients[uuid.v4()] = ws;
+
   ws.on('message', (message) => {
     const data = JSON.parse(message);
 
@@ -66,23 +69,37 @@ wssServer.on('connection', (ws) => {
         return;
     }
 
-    if (data.type === 'exit') {
-      users = users.filter(u => u !== data.nickname);
+    // if (data.type === 'exit') {
+    //   users = users.filter(u => u !== data.nickname);
 
-      clients.get(data.nickname).close();
-      clients.delete(data.nickname);
+    //   clients.get(data.nickname).close();
+    //   clients.delete(data.nickname);
 
-      Array.from(wssServer.clients)
-        .filter(client => client.readyState === WS.OPEN)
-        .forEach(client => client.send(JSON.stringify({
-          type: 'users',
-          users,
-        })));
-      return;
-    }
+    //   Array.from(wssServer.clients)
+    //     .filter(client => client.readyState === WS.OPEN)
+    //     .forEach(client => client.send(JSON.stringify({
+    //       type: 'users',
+    //       users,
+    //     })));
+    //   return;
+    // }
   });
 
-  ws.send(JSON.stringify({ type: 'allMessages', chat }));
+  ws.on('close', (data) => {
+    // users = users.filter(u => u !== data.nickname);
+
+    // delete clients[id];
+
+    Array.from(wssServer.clients)
+      .filter(client => client.readyState === WS.OPEN)
+      .forEach(client => client.send(JSON.stringify({
+        type: 'users',
+        users,
+      })));
+    return;
+  });
+
+  ws.send(JSON.stringify({ type: 'allMessages', chat, clients: Array.from(wssServer.clients) }));
 });
 
 server.listen(port, (err) => {
