@@ -15,7 +15,7 @@ app.use(koaBody({
   json: true
 }));
 
-let clientssssss = {};
+let chatClients = {};
 
 const chat = [{
   user: 'olga',
@@ -39,14 +39,13 @@ const wssServer = new WS.Server({server});
 
 wssServer.on('connection', (ws) => {
   const id = uuid.v4();
-  // clients[id].ws = ws;
 
   ws.on('message', (message) => {
     const data = JSON.parse(message);
 
     if (data.type === 'register') {
       users.push(data.nickname);
-      clientssssss[id] = data.nickname;
+      chatClients[id] = data.nickname;
 
       Array.from(wssServer.clients)
         .filter(client => client.readyState === WS.OPEN)
@@ -68,26 +67,11 @@ wssServer.on('connection', (ws) => {
         })));
         return;
     }
-
-    if (data.type === 'exit') {
-      users = users.filter(u => u !== data.nickname);
-
-      // clients.get(data.nickname).close();
-      // clients.delete(data.nickname);
-
-      // Array.from(wssServer.clients)
-      //   .filter(client => client.readyState === WS.OPEN)
-      //   .forEach(client => client.send(JSON.stringify({
-      //     type: 'users',
-      //     users,
-      //   })));
-      return;
-    }
   });
 
   ws.on('close', () => {
-    users = users.filter(u => u !== clientssssss[id]);
-
+    users = users.filter(u => u !== chatClients[id]);
+    delete chatClients[id];
 
     Array.from(wssServer.clients)
     .filter(client => client.readyState === WS.OPEN)
@@ -95,7 +79,6 @@ wssServer.on('connection', (ws) => {
       type: 'users',
       users,
     })));
-    delete clientssssss[id];
     return;
   });
 
