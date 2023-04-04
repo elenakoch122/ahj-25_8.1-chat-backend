@@ -69,23 +69,23 @@ wssServer.on('connection', (ws) => {
         return;
     }
 
-    // if (data.type === 'exit') {
-    //   users = users.filter(u => u !== data.nickname);
+    if (data.type === 'exit') {
+      users = users.filter(u => u !== data.nickname);
 
-    //   clients.get(data.nickname).close();
-    //   clients.delete(data.nickname);
+      // clients.get(data.nickname).close();
+      // clients.delete(data.nickname);
 
-    //   Array.from(wssServer.clients)
-    //     .filter(client => client.readyState === WS.OPEN)
-    //     .forEach(client => client.send(JSON.stringify({
-    //       type: 'users',
-    //       users,
-    //     })));
-    //   return;
-    // }
+      // Array.from(wssServer.clients)
+      //   .filter(client => client.readyState === WS.OPEN)
+      //   .forEach(client => client.send(JSON.stringify({
+      //     type: 'users',
+      //     users,
+      //   })));
+      return;
+    }
   });
 
-  ws.on('close', (data) => {
+  ws.on('close', () => {
     // users = users.filter(u => u !== data.nickname);
 
     // delete clients[id];
@@ -95,7 +95,6 @@ wssServer.on('connection', (ws) => {
       .forEach(client => client.send(JSON.stringify({
         type: 'users',
         users,
-        data
       })));
     return;
   });
