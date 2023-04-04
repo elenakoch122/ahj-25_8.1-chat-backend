@@ -14,6 +14,8 @@ app.use(koaBody({
   json: true
 }));
 
+let clients = new Map();
+
 const chat = [{
   user: 'olga',
   message: 'welcome to chat',
@@ -30,7 +32,6 @@ app.use(async (ctx) => {
 });
 
 const port = process.env.PORT || 7070;
-// const port = 7070;
 const server = http.createServer(app.callback());
 
 const wssServer = new WS.Server({server});
@@ -41,6 +42,8 @@ wssServer.on('connection', (ws) => {
 
     if (data.type === 'register') {
       users.push(data.nickname);
+
+      clients.set(data.nickname, ws);
 
       Array.from(wssServer.clients)
         .filter(client => client.readyState === WS.OPEN)
@@ -64,6 +67,9 @@ wssServer.on('connection', (ws) => {
 
     if (data.type === 'exit') {
       users = users.filter(u => u !== data.nickname);
+
+      clients.get(data.nickname).close();
+      clients.delete(data.nickname);
 
       Array.from(wssServer.clients)
         .filter(client => client.readyState === WS.OPEN)
