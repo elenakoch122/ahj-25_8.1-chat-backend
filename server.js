@@ -39,14 +39,14 @@ const wssServer = new WS.Server({server});
 
 wssServer.on('connection', (ws) => {
   const id = uuid.v4();
-  clients[id].ws = ws;
+  // clients[id].ws = ws;
 
   ws.on('message', (message) => {
     const data = JSON.parse(message);
 
     if (data.type === 'register') {
       users.push(data.nickname);
-      clients[id].user = data.nickname;
+      clients[id] = data.nickname;
 
       Array.from(wssServer.clients)
         .filter(client => client.readyState === WS.OPEN)
@@ -86,7 +86,7 @@ wssServer.on('connection', (ws) => {
   });
 
   ws.on('close', () => {
-    users = users.filter(u => u !== clients[id].user);
+    users = users.filter(u => u !== clients[id]);
 
     delete clients[id];
 
