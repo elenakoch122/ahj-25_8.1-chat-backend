@@ -15,7 +15,7 @@ app.use(koaBody({
   json: true
 }));
 
-// let chatClients = {};
+let chatClients = {};
 
 const chat = [{
   user: 'olga',
@@ -38,14 +38,14 @@ const server = http.createServer(app.callback());
 const wssServer = new WS.Server({server});
 
 wssServer.on('connection', (ws) => {
-  // const id = uuid.v4();
+  const id = uuid.v4();
 
   ws.on('message', (message) => {
     const data = JSON.parse(message);
 
     if (data.type === 'register') {
       users.push(data.nickname);
-      // chatClients[id] = data.nickname;
+      chatClients[id] = data.nickname;
 
       Array.from(wssServer.clients)
         .filter(client => client.readyState === WS.OPEN)
@@ -70,15 +70,15 @@ wssServer.on('connection', (ws) => {
   });
 
   ws.on('close', () => {
-    // users = users.filter(u => u !== chatClients[id]);
-    // delete chatClients[id];
+    users = users.filter(u => u !== chatClients[id]);
+    delete chatClients[id];
 
     Array.from(wssServer.clients)
-    .filter(client => client.readyState === WS.OPEN)
-    .forEach(client => client.send(JSON.stringify({
-      type: 'users',
-      users,
-    })));
+      .filter(client => client.readyState === WS.OPEN)
+      .forEach(client => client.send(JSON.stringify({
+        type: 'users',
+        users,
+      })));
     return;
   });
 
