@@ -85,19 +85,20 @@ wssServer.on('connection', (ws) => {
     // }
   });
 
-  // ws.on('close', (data) => {
-  //   // users = users.filter(u => u !== data.nickname);
+  ws.on('close', (data) => {
+    // users = users.filter(u => u !== data.nickname);
 
-  //   // delete clients[id];
+    // delete clients[id];
 
-  //   Array.from(wssServer.clients)
-  //     .filter(client => client.readyState === WS.OPEN)
-  //     .forEach(client => client.send(JSON.stringify({
-  //       type: 'users',
-  //       users,
-  //     })));
-  //   return;
-  // });
+    Array.from(wssServer.clients)
+      .filter(client => client.readyState === WS.OPEN)
+      .forEach(client => client.send(JSON.stringify({
+        type: 'users',
+        users,
+        data
+      })));
+    return;
+  });
 
   ws.send(JSON.stringify({ type: 'allMessages', chat }));
 });
